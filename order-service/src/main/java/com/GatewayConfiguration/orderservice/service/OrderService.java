@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
-    public void placeOrder(OrderRequest orderRequest){
+    public String placeOrder(OrderRequest orderRequest){
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
         List<OrderLineItems> orderLineItemsList = orderRequest.getOrderLineItemsDtoList().stream().map(this::mapToDto).collect(Collectors.toList());
@@ -41,6 +41,7 @@ public class OrderService {
         boolean allProductsInStock = Arrays.stream(inventoryResponse).allMatch(InventoryResponse::isInStock);
         if(allProductsInStock){
             orderRepository.save(order);
+            return "Order Placed Successfully";
         }else{
             log.info("No inventory for order ");
             throw new IllegalArgumentException("product is not in stock , please try again later");
